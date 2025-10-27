@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>truemail.io — Dashboard</title>
+        <link rel="stylesheet" href="/enhanced-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
+
+        .input-error {
+            border-color: var(--error) !important;
+        }
+
+        .input-error:focus {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .terms-group .error-message {
+            text-align: left;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="nav">
+        <div class="brand">
+            <span>truemail.io</span>
+            <span class="badge">App</span>
+        </div>
+        <nav class="nav-items">
+            <a href="/" class="nav-link">Home</a>
+            <!-- Authenticated Nav Items -->
+            <a id="dashboardLink" href="/app.html#dashboard" class="nav-link hidden">Dashboard</a>
+            <div id="navUserInfo" class="user-info hidden">
+                <span class="credit-badge">
+                    <i class="fas fa-coins"></i>
+                    <span id="navCredits">0</span> credits
+                </span>
+                <button id="logoutBtn" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="app-wrapper">
+        <!-- Auth Section -->
+        <section id="authCard" class="auth-container hidden">
+            <div class="auth-box">
+                <div class="auth-sidebar">
+                    <div class="auth-sidebar-content">
+                        <div class="brand-logo">
+                            <i class="fas fa-envelope-open-text"></i>
+                            <span>truemail.io</span>
+                        </div>
+                        <h2>Welcome Back!</h2>
+                        <p>The most accurate and fastest way to find and verify professional email addresses.</p>
+                        <div class="auth-features">
+                            <div class="auth-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Real-time Email Verification</span>
+                            </div>
+                            <div class="auth-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Advanced Pattern Detection</span>
+                            </div>
+                            <div class="auth-feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Secure & Reliable Results</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-content">
+                    <div class="auth-header">
+                        <h3 class="auth-title">Access Your Dashboard</h3>
+                        <div class="form-tabs">
+                            <button class="tab-btn active" data-tab="login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                            <button class="tab-btn" data-tab="register">
+                                <i class="fas fa-user-plus"></i> Register
+                            </button>
+                        </div>
+                    </div>
+            
+                    <!-- Login Form -->
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="loginEmail" class="form-input" placeholder="email@company.com" required>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="loginPassword" class="form-input" placeholder="Password" required>
+                                <button type="button" class="password-toggle" tabindex="-1">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="rememberMe">
+                                <span class="checkbox-text">Remember me</span>
+                            </label>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+                        <button type="submit" id="loginBtn" class="btn btn-primary btn-block">
+                            <span class="btn-text">Sign In to Dashboard</span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="registerForm" class="auth-form hidden">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="regName" class="form-input" placeholder="Full Name" required>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="regEmail" class="form-input" placeholder="email@company.com" required>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="regPassword" class="form-input" placeholder="Create a Password" required>
+                                <button type="button" class="password-toggle" tabindex="-1">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+                        <div class="form-group terms-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <span class="checkbox-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                            </label>
+                        </div>
+                        <button type="submit" id="regBtn" class="btn btn-primary btn-block">
+                            <span class="btn-text">Create Free Account</span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </form>
+                    <div id="authStatus" class="error-message mt-4"></div>
+
+                    <div class="auth-footer">
+                        <div class="security-badges">
+                            <div class="security-badge">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>256-bit SSL</span>
+                            </div>
+                            <div class="security-badge">
+                                <i class="fas fa-lock"></i>
+                                <span>Secure Login</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="hidden">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <h2 class="user-name">Welcome, <span id="userName">User</span></h2>
+                    <p class="text-light">Let's find some emails!</p>
+                </div>
+                <div class="credit-badge">
+                    <i class="fas fa-coins"></i>
+                    <span id="userCredits">0</span> credits
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Email Generator -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-at"></i>
+                            Generate Emails
+                        </h3>
+                        <span class="text-muted">1 credit per search</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">First Name</label>
+                                <input type="text" id="first" class="form-input" placeholder="John">
+                            </div>
+                            <div>
+                                <label class="form-label">Last Name</label>
+                                <input type="text" id="last" class="form-input" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Domain</label>
+                            <input type="text" id="domain2" class="form-input" placeholder="company.com">
+                        </div>
+                        <button id="genBtn" class="btn btn-primary mt-4">
+                            <span class="btn-text">
+                                <i class="fas fa-search"></i>
+                                Generate Emails
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </div>
+                    <div id="genResult" class="result-container"></div>
+                </div>
+
+                <!-- Email Verifier -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-check-circle"></i>
+                            Verify Email
+                        </h3>
+                        <span class="text-muted">1 credit per verification</span>
+                    </div>
+                    <div class="card-content">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="email@domain.com">
+                        <div class="form-check mt-4">
+                            <label class="form-check-label">
+                                <input type="checkbox" id="smtp">
+                                <span>Try SMTP connect (may be blocked)</span>
+                            </label>
+                        </div>
+                        <button id="verifyBtn" class="btn btn-primary mt-4">
+                            <span class="btn-text">
+                                <i class="fas fa-shield-alt"></i>
+                                Verify Email
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </div>
+                    <div id="verifyResult" class="result-container"></div>
+                </div>
+
+                <!-- Bulk Operations (Placeholder) -->
+                <div class="dashboard-card disabled">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-layer-group"></i>
+                            Bulk Processing
+                        </h3>
+                        <span class="badge-pro">Pro Plan</span>
+                    </div>
+                    <div class="card-content">
+                        <p class="text-light">Upload a CSV file to find and verify thousands of emails in a single batch. Results will be available for download from your dashboard.</p>
+                        <button class="btn btn-primary mt-4" disabled>
+                            <i class="fas fa-arrow-up"></i>
+                            Upload CSV (Coming Soon)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manage Subscription / Add Credits -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-credit-card"></i>
+                            Manage Subscription
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <p class="text-light">You are currently on the <strong>Basic Plan</strong>. Upgrade your plan to get more credits and unlock premium features.</p>
+                        <button id="viewPlansBtn" class="btn btn-primary mt-4">
+                            <i class="fas fa-arrow-up"></i> View Plans & Pricing
+                        </button>
+                    </div>
+                </div>
+
+                <!-- API & Docs (Placeholder) -->
+                <div class="dashboard-card disabled">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-code"></i>
+                            API & Integrations
+                        </h3>
+                        <span class="badge-pro">Pro Plan</span>
+                    </div>
+                    <div class="card-content">
+                        <p class="text-light">Integrate our powerful email finding and verification tools directly into your own applications with our simple REST API.</p>
+                        <button class="btn btn-outline mt-4" disabled>
+                            <i class="fas fa-book"></i>
+                            View API Docs (Coming Soon)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Pricing Modal -->
+    <div id="pricingModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Choose Your Plan</h2>
+                <p>Upgrade to unlock more features and increase your credit limit.</p>
+                <button id="closeModalBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="plan-name">Basic</div>
+                            <div class="plan-price"><span class="amount">Free</span></div>
+                            <div class="plan-description">Current Plan</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> 5 starter credits</li>
+                            <li class="disabled"><i class="fas fa-times-circle"></i> API access</li>
+                        </ul>
+                        <button class="btn btn-outline-primary" disabled>Your Plan</button>
+                    </div>
+
+                    <div class="pricing-card featured">
+                        <div class="popular-badge">Most Popular</div>
+                        <div class="pricing-header">
+                            <div class="plan-name">Starter</div>
+                            <div class="plan-price">
+                                <span class="currency">$</span><span class="amount">9</span><span class="period">/mo</span>
+                            </div>
+                            <div class="plan-description">For small teams</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> 20 credits/mo</li>
+                            <li><i class="fas fa-check-circle"></i> API access</li>
+                            <li><i class="fas fa-check-circle"></i> CSV export</li>
+                        </ul>
+                        <button class="btn btn-primary btn-glow purchase-plan-btn" data-plan="starter">
+                            <span>Choose Starter</span><i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="plan-name">Professional</div>
+                            <div class="plan-price">
+                                <span class="currency">$</span><span class="amount">29</span><span class="period">/mo</span>
+                            </div>
+                            <div class="plan-description">For growing businesses</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> 100 credits/mo</li>
+                            <li><i class="fas fa-check-circle"></i> Advanced API</li>
+                            <li><i class="fas fa-check-circle"></i> Priority support</li>
+                        </ul>
+                        <button class="btn btn-outline-primary purchase-plan-btn" data-plan="pro">
+                            <span>Choose Pro</span><i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="pricing-card enterprise">
+                        <div class="pricing-header">
+                            <div class="plan-name">Enterprise</div>
+                            <div class="plan-price"><span class="custom-text">Custom</span></div>
+                            <div class="plan-description">For large organizations</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> Unlimited credits</li>
+                            <li><i class="fas fa-check-circle"></i> Dedicated support</li>
+                            <li><i class="fas fa-check-circle"></i> SLA guarantee</li>
+                        </ul>
+                        <button class="btn btn-outline-primary purchase-plan-btn" data-plan="enterprise">
+                            <span>Contact Sales</span><i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="text-muted">© truemail.io — Professional Email Finding Tool</div>
+    </footer>
+
+    <script src="/app.js"></script>
+    <script src="/auth.js"></script>
+</body>
+</html>

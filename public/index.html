@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Email Hunter — Professional</title>
+    <link rel="stylesheet" href="/enhanced-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <header class="nav glass-effect" data-observe>
+        <div class="brand">
+          <i class="fas fa-envelope-open-text brand-icon"></i>
+          truemail.io
+          <span class="badge">Beta</span>
+        </div>
+        <nav class="nav-items">
+          <a href="#features" class="nav-link">
+            <i class="fas fa-star"></i>
+            Features
+          </a>
+          <a href="#pricing" class="nav-link">
+            <i class="fas fa-tag"></i>
+            Pricing
+          </a>
+          <a href="#docs" class="nav-link">
+            <i class="fas fa-book"></i>
+            Docs
+          </a>
+          <a href="#contact" class="nav-link">
+            <i class="fas fa-headset"></i>
+            Contact
+          </a>
+          <a id="navLogin" href="/app.html" class="nav-link nav-cta">
+            <i class="fas fa-sign-in-alt"></i>
+            Login / Dashboard
+          </a>
+        </nav>
+      </header>
+
+      <main class="main-content">
+        <section class="hero" data-observe>
+          <div class="hero-content">
+            <h1>Find & Verify Professional Emails — Fast and Accurate</h1>
+            <p class="lead">Bulk email finding, single lookup, and powerful validation (MX + optional SMTP). Built for teams and developers with easy API integration and transparent pricing. Trusted demo — Truemail.io</p>
+            <div class="hero-cta">
+              <button id="ctaGetStarted" class="btn btn-primary btn-large">Get started — Free</button>
+              <a class="cta-ghost" href="#pricing">See pricing</a>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="demo-card glass-card">
+              <div class="demo-header">
+                <h3>
+                  <i class="fas fa-rocket"></i>
+                  Try it Now
+                </h3>
+                <span class="demo-badge">Live Demo</span>
+              </div>
+              <div class="demo-content">
+                <div class="demo-form">
+                  <div class="input-group">
+                    <i class="fas fa-globe input-icon"></i>
+                    <input id="domain" 
+                           placeholder="Enter domain (e.g. company.com)" 
+                           class="demo-input"
+                           autocomplete="off"
+                           spellcheck="false">
+                  </div>
+                  <button id="demoGenerate" class="btn btn-primary btn-glow" aria-label="Generate Emails">
+                    <i class="fas fa-magic"></i>
+                    <span>Generate Patterns</span>
+                  </button>
+                </div>
+                <div class="demo-results" id="demoOut">
+                  <div class="demo-placeholder">
+                    <i class="fas fa-lightbulb demo-icon"></i>
+                    <p>Enter a domain to see email patterns</p>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-footer">
+                <div class="demo-stat">
+                  <i class="fas fa-bolt"></i>
+                  <span>Instant Results</span>
+                </div>
+                <div class="demo-stat">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>100% Secure</span>
+                </div>
+                <div class="demo-stat">
+                  <i class="fas fa-check-circle"></i>
+                  <span>High Accuracy</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" class="section features-section" data-observe>
+          <div class="section-header">
+            <span class="section-badge">Features</span>
+            <h2 class="section-title">What makes us different</h2>
+            <p class="section-subtitle">Powerful tools to supercharge your email discovery workflow</p>
+          </div>
+          
+          <div class="features-grid">
+            <div class="feature-card" data-observe>
+              <div class="feature-icon-wrapper gradient-1">
+                <i class="fas fa-search"></i>
+              </div>
+              <h4>Smart Email Finder</h4>
+              <p>AI-powered pattern detection to find the most likely email addresses instantly.</p>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Name + domain based search</li>
+                <li><i class="fas fa-check"></i> Pattern recognition</li>
+                <li><i class="fas fa-check"></i> Instant results</li>
+              </ul>
+            </div>
+            
+            <div class="feature-card" data-observe>
+              <div class="feature-icon-wrapper gradient-2">
+                <i class="fas fa-layer-group"></i>
+              </div>
+              <h4>Bulk Processing</h4>
+              <p>Handle thousands of email lookups in one go with our powerful batch processing.</p>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> CSV/Excel upload</li>
+                <li><i class="fas fa-check"></i> Parallel processing</li>
+                <li><i class="fas fa-check"></i> Progress tracking</li>
+              </ul>
+            </div>
+            
+            <div class="feature-card" data-observe>
+              <div class="feature-icon-wrapper gradient-3">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <h4>Advanced Verification</h4>
+              <p>Multi-layer validation ensures you only get valid, active email addresses.</p>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Syntax validation</li>
+                <li><i class="fas fa-check"></i> MX record check</li>
+                <li><i class="fas fa-check"></i> SMTP verification</li>
+              </ul>
+            </div>
+            
+            <div class="feature-card" data-observe>
+              <div class="feature-icon-wrapper gradient-4">
+                <i class="fas fa-code"></i>
+              </div>
+              <h4>Developer API</h4>
+              <p>RESTful API with comprehensive documentation for seamless integration.</p>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> REST endpoints</li>
+                <li><i class="fas fa-check"></i> Token authentication</li>
+                <li><i class="fas fa-check"></i> Rate limiting</li>
+              </ul>
+            </div>
+            
+            <div class="feature-card" data-observe>
+              <div class="feature-icon-wrapper gradient-5">
+                <i class="fas fa-users"></i>
+              </div>
+              <h4>Team Collaboration</h4>
+              <p>Share resources and manage access across your entire organization.</p>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Shared credits</li>
+                <li><i class="fas fa-check"></i> Usage analytics</li>
+                <li><i class="fas fa-check"></i> Role management</li>
+              </ul>
+            </div>
+            
+            <div class="feature-card" data-observe>
+              <div class="feature-icon-wrapper gradient-6">
+                <i class="fas fa-file-export"></i>
+              </div>
+              <h4>Export & Integrate</h4>
+              <p>Export results in multiple formats and integrate with your favorite tools.</p>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Multiple formats</li>
+                <li><i class="fas fa-check"></i> CRM integration</li>
+                <li><i class="fas fa-check"></i> Webhook support</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" class="section how-it-works-section" data-observe>
+          <div class="section-header">
+            <span class="section-badge">Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Find any email address in three simple steps.</p>
+          </div>
+          <div class="steps-container">
+            <div class="step-card" data-observe>
+              <div class="step-icon-wrapper">
+                <div class="step-number">1</div>
+                <i class="fas fa-keyboard"></i>
+              </div>
+              <h4 class="step-title">Enter Details</h4>
+              <p class="step-description">Provide a name and a domain, or just a domain for common company emails.</p>
+            </div>
+            <div class="step-card" data-observe style="animation-delay: 0.2s;">
+              <div class="step-icon-wrapper">
+                <div class="step-number">2</div>
+                <i class="fas fa-cogs"></i>
+              </div>
+              <h4 class="step-title">Generate & Verify</h4>
+              <p class="step-description">Our engine generates likely patterns and verifies them against mail servers.</p>
+            </div>
+            <div class="step-card" data-observe style="animation-delay: 0.4s;">
+              <div class="step-icon-wrapper">
+                <div class="step-number">3</div>
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <h4 class="step-title">Get Results</h4>
+              <p class="step-description">Receive a list of valid emails with confidence scores, ready for use.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" class="section pricing-section" data-observe>
+          <div class="section-header">
+            <span class="section-badge">Pricing</span>
+            <h2 class="section-title">Choose Your Perfect Plan</h2>
+            <p class="section-subtitle">Transparent pricing with no hidden fees. Start free, upgrade anytime.</p>
+          </div>
+          
+          <div class="pricing-grid">
+            <div class="pricing-card" data-observe>
+              <div class="pricing-header">
+                <div class="plan-name">Basic</div>
+                <div class="plan-price">
+                  <span class="currency">$</span>
+                  <span class="amount">0</span>
+                  <span class="period">/mo</span>
+                </div>
+                <div class="plan-description">Perfect for testing and personal use</div>
+              </div>
+              
+              <ul class="pricing-features">
+                <li><i class="fas fa-check-circle"></i> 5 starter credits</li>
+                <li><i class="fas fa-check-circle"></i> Single email lookup</li>
+                <li><i class="fas fa-check-circle"></i> Basic validation</li>
+                <li><i class="fas fa-check-circle"></i> Web dashboard</li>
+                <li class="disabled"><i class="fas fa-times-circle"></i> API access</li>
+                <li class="disabled"><i class="fas fa-times-circle"></i> Bulk operations</li>
+              </ul>
+              
+              <button class="choosePlan btn btn-outline-primary" data-plan="basic" data-credits="5" data-price="0">
+                <span>Start Free</span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+
+            <div class="pricing-card featured" data-observe>
+              <div class="popular-badge">Most Popular</div>
+              <div class="pricing-header">
+                <div class="plan-name">Starter</div>
+                <div class="plan-price">
+                  <span class="currency">$</span>
+                  <span class="amount">9</span>
+                  <span class="period">/mo</span>
+                </div>
+                <div class="plan-description">Great for small teams and startups</div>
+              </div>
+              
+              <ul class="pricing-features">
+                <li><i class="fas fa-check-circle"></i> 20 credits monthly</li>
+                <li><i class="fas fa-check-circle"></i> Bulk email finding</li>
+                <li><i class="fas fa-check-circle"></i> Advanced validation</li>
+                <li><i class="fas fa-check-circle"></i> API access</li>
+                <li><i class="fas fa-check-circle"></i> CSV export</li>
+                <li><i class="fas fa-check-circle"></i> Email support</li>
+              </ul>
+              
+              <button class="choosePlan btn btn-primary btn-glow" data-plan="starter" data-credits="20" data-price="9">
+                <span>Get Started</span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+
+            <div class="pricing-card" data-observe>
+              <div class="pricing-header">
+                <div class="plan-name">Professional</div>
+                <div class="plan-price">
+                  <span class="currency">$</span>
+                  <span class="amount">29</span>
+                  <span class="period">/mo</span>
+                </div>
+                <div class="plan-description">For growing businesses</div>
+              </div>
+              
+              <ul class="pricing-features">
+                <li><i class="fas fa-check-circle"></i> 100 credits monthly</li>
+                <li><i class="fas fa-check-circle"></i> Advanced API features</li>
+                <li><i class="fas fa-check-circle"></i> Priority validation</li>
+                <li><i class="fas fa-check-circle"></i> Team dashboard</li>
+                <li><i class="fas fa-check-circle"></i> Priority support</li>
+                <li><i class="fas fa-check-circle"></i> Custom integrations</li>
+              </ul>
+              
+              <button class="choosePlan btn btn-outline-primary" data-plan="pro" data-credits="100" data-price="29">
+                <span>Choose Pro</span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+
+            <div class="pricing-card enterprise" data-observe>
+              <div class="pricing-header">
+                <div class="plan-name">Enterprise</div>
+                <div class="plan-price">
+                  <span class="custom-text">Custom</span>
+                </div>
+                <div class="plan-description">For large organizations</div>
+              </div>
+              
+              <ul class="pricing-features">
+                <li><i class="fas fa-check-circle"></i> Unlimited credits</li>
+                <li><i class="fas fa-check-circle"></i> Custom API limits</li>
+                <li><i class="fas fa-check-circle"></i> Dedicated support</li>
+                <li><i class="fas fa-check-circle"></i> SLA guarantee</li>
+                <li><i class="fas fa-check-circle"></i> Custom features</li>
+                <li><i class="fas fa-check-circle"></i> On-premise option</li>
+              </ul>
+              
+              <button class="choosePlan btn btn-outline-primary" data-plan="enterprise" data-credits="0" data-price="contact">
+                <span>Contact Sales</span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+            <!-- Pricing Modal -->
+            <div id="pricingModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Choose Your Plan</h2>
+                <p>Start for free, upgrade anytime to unlock more features.</p>
+                <button id="closeModalBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="plan-name">Basic</div>
+                            <div class="plan-price"><span class="amount">Free</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> 5 starter credits</li>
+                            <li class="disabled"><i class="fas fa-times-circle"></i> API access</li>
+                        </ul>
+                        <button class="btn btn-outline-primary purchase-plan-btn" data-plan="basic">Get Started</button>
+                    </div>
+
+                    <div class="pricing-card featured">
+                        <div class="popular-badge">Most Popular</div>
+                        <div class="pricing-header">
+                            <div class="plan-name">Starter</div>
+                            <div class="plan-price"><span class="currency">$</span><span class="amount">9</span><span class="period">/mo</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> 20 credits/mo</li>
+                            <li><i class="fas fa-check-circle"></i> API access</li>
+                        </ul>
+                        <button class="btn btn-primary btn-glow purchase-plan-btn" data-plan="starter">Choose Starter</button>
+                    </div>
+
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="plan-name">Professional</div>
+                            <div class="plan-price"><span class="currency">$</span><span class="amount">29</span><span class="period">/mo</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> 100 credits/mo</li>
+                            <li><i class="fas fa-check-circle"></i> Advanced API</li>
+                        </ul>
+                        <button class="btn btn-outline-primary purchase-plan-btn" data-plan="pro">Choose Pro</button>
+                    </div>
+
+                    <div class="pricing-card enterprise">
+                        <div class="pricing-header">
+                            <div class="plan-name">Enterprise</div>
+                            <div class="plan-price"><span class="custom-text">Custom</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check-circle"></i> Unlimited credits</li>
+                            <li><i class="fas fa-check-circle"></i> Dedicated support</li>
+                        </ul>
+                        <button class="btn btn-outline-primary purchase-plan-btn" data-plan="enterprise">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+          </div>
+        </section>
+
+        <section id="contact" class="section contact-section" data-observe>
+          <div class="section-header">
+            <span class="section-badge">Support</span>
+            <h2 class="section-title">Get in Touch</h2>
+            <p class="section-subtitle">We're here to help. Reach out for any questions or support needs.</p>
+          </div>
+          <div class="contact-container">
+            <div class="contact-card">
+              <div class="contact-icon-wrapper gradient-1">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <h4 class="contact-title">General Inquiries</h4>
+              <p class="contact-description">For general questions about our service and features.</p>
+              <a href="mailto:contact@truemail.io" class="contact-link">contact@truemail.io</a>
+            </div>
+            <div class="contact-card">
+              <div class="contact-icon-wrapper gradient-3">
+                <i class="fas fa-headset"></i>
+              </div>
+              <h4 class="contact-title">Technical Support</h4>
+              <p class="contact-description">Need help with integration or facing an issue?</p>
+              <a href="mailto:support@truemail.io" class="contact-link">support@truemail.io</a>
+            </div>
+            <div class="contact-card">
+              <div class="contact-icon-wrapper gradient-5">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <h4 class="contact-title">Sales & Enterprise</h4>
+              <p class="contact-description">For custom plans, large volumes, and partnerships.</p>
+              <a href="mailto:sales@truemail.io" class="contact-link">sales@truemail.io</a>
+            </div>
+          </div>
+          <div class="contact-form-placeholder" data-observe>
+            <h3>
+              <i class="fas fa-paper-plane"></i>
+              Send a Message (Coming Soon)
+            </h3>
+            <p>
+              Our interactive contact form is under construction. For now, please use the email addresses above to get in touch with us. We'll get back to you as soon as possible!
+            </p>
+          </div>
+        </section>
+
+        <!-- Auth and dashboard moved to /app.html to keep landing page focused -->
+      </main>
+
+      <footer class="footer">
+        <div>© truemail.io — Demo prototype. Not for production use.</div>
+      </footer>
+
+      <script src="/landing.js"></script>
+    </div>
+  </body>
+</html>

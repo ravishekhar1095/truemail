@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>truemail.io — App</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="nav">
+        <div class="brand">
+            <span>truemail.io</span>
+            <span class="badge">App</span>
+        </div>
+        <nav class="nav-items">
+            <a href="/" class="nav-link">Home</a>
+            <div id="authNav" class="hidden">
+                <a href="/app.html#dashboard" class="nav-link">Dashboard</a>
+                <div class="user-info">
+                    <span class="credit-badge">
+                        <i class="fas fa-coins"></i>
+                        <span id="navCredits">0</span> credits
+                    </span>
+                    <button id="logoutBtn" class="btn btn-outline">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Auth Section -->
+        <section id="authCard" class="card">
+            <div class="card-header">
+                <h3 class="card-title">Welcome to truemail.io</h3>
+            </div>
+            <div class="form-tabs">
+                <button class="tab-btn active" data-tab="login">Login</button>
+                <button class="tab-btn" data-tab="register">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                    <div class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                    <div class="error-message"></div>
+                </div>
+                <button type="submit" id="loginBtn" class="btn btn-primary">
+                    <span class="btn-text">Login</span>
+                    <i class="fas fa-spinner fa-spin loader hidden"></i>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i>
+                        Full Name
+                    </label>
+                    <input type="text" id="regName" class="form-input" required>
+                    <div class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="regEmail" class="form-input" required>
+                    <div class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="regPassword" class="form-input" required>
+                    <div class="error-message"></div>
+                </div>
+                <button type="submit" id="regBtn" class="btn btn-primary">
+                    <span class="btn-text">Create Free Account</span>
+                    <i class="fas fa-spinner fa-spin loader hidden"></i>
+                </button>
+            </form>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="hidden">
+            <div class="dashboard-header card">
+                <div class="user-info">
+                    <h2 class="user-name">Welcome, <span id="userName">User</span></h2>
+                    <div class="credit-badge">
+                        <i class="fas fa-coins"></i>
+                        <span id="userCredits">0</span> credits
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Email Generator -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-at"></i>
+                            Generate Emails
+                        </h3>
+                        <span class="text-muted">1 credit per search</span>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">First Name</label>
+                                <input type="text" id="first" class="form-input" placeholder="John">
+                            </div>
+                            <div>
+                                <label class="form-label">Last Name</label>
+                                <input type="text" id="last" class="form-input" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Domain</label>
+                            <input type="text" id="domain2" class="form-input" placeholder="company.com">
+                        </div>
+                        <button id="genBtn" class="btn btn-primary">
+                            <span class="btn-text">
+                                <i class="fas fa-search"></i>
+                                Generate Emails
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </div>
+                    <div id="genResult" class="result-container"></div>
+                </div>
+
+                <!-- Email Verifier -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-check-circle"></i>
+                            Verify Email
+                        </h3>
+                        <span class="text-muted">1 credit per verification</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="email@domain.com">
+                        <div class="form-check mt-4">
+                            <label class="form-check-label">
+                                <input type="checkbox" id="smtp">
+                                <span>Try SMTP connect (may be blocked)</span>
+                            </label>
+                        </div>
+                        <button id="verifyBtn" class="btn btn-primary mt-4">
+                            <span class="btn-text">
+                                <i class="fas fa-shield-alt"></i>
+                                Verify Email
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </div>
+                    <div id="verifyResult" class="result-container"></div>
+                </div>
+
+                <!-- Add Credits -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-coins"></i>
+                            Add Credits
+                        </h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount to Add</label>
+                        <input type="number" id="addAmount" class="form-input" value="10" min="5">
+                        <button id="addCreditsBtn" class="btn btn-primary mt-4">
+                            <span class="btn-text">
+                                <i class="fas fa-plus-circle"></i>
+                                Purchase Credits
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="text-muted">© truemail.io — Professional Email Finding Tool</div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>

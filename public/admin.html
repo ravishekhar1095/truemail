@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>truemail.io — Admin Dashboard</title>
+    <link rel="stylesheet" href="/enhanced-styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="brand">
+            <span>truemail.io</span>
+            <span class="badge admin-badge">Admin</span>
+        </div>
+        <nav class="nav-items">
+            <div class="admin-info">
+                <span class="admin-name">Admin</span>
+                <button id="logoutBtn" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <nav class="admin-nav">
+                <a href="#dashboard" class="admin-nav-item active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+                <a href="#users" class="admin-nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    Users
+                </a>
+                <a href="#plans" class="admin-nav-item" data-section="plans">
+                    <i class="fas fa-crown"></i>
+                    Plans
+                </a>
+                <a href="#credits" class="admin-nav-item" data-section="credits">
+                    <i class="fas fa-coins"></i>
+                    Credits
+                </a>
+                <a href="#history" class="admin-nav-item" data-section="history">
+                    <i class="fas fa-history"></i>
+                    History
+                </a>
+                <a href="#settings" class="admin-nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="admin-section active">
+                <div class="admin-header-row">
+                    <h2>Dashboard Overview</h2>
+                    <div class="date-range">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-calendar"></i>
+                            Last 30 Days
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Users</h3>
+                            <div class="stat-value" id="totalUsers">-</div>
+                            <div class="stat-change positive">+5% from last month</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon credits">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Credits Used</h3>
+                            <div class="stat-value" id="totalCredits">-</div>
+                            <div class="stat-change positive">+12% from last month</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon operations">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Email Operations</h3>
+                            <div class="stat-value" id="totalOperations">-</div>
+                            <div class="stat-change positive">+8% from last month</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Revenue</h3>
+                            <div class="stat-value" id="totalRevenue">-</div>
+                            <div class="stat-change positive">+15% from last month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>User Activity</h3>
+                        <canvas id="userActivityChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Credit Usage</h3>
+                        <canvas id="creditUsageChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="admin-section">
+                <div class="admin-header-row">
+                    <h2>User Management</h2>
+                    <div class="admin-actions">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search users..." id="userSearch">
+                        </div>
+                        <button class="btn btn-primary" id="addUserBtn">
+                            <i class="fas fa-plus"></i>
+                            Add User
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Plan</th>
+                                <th>Credits</th>
+                                <th>Status</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="table-pagination">
+                        <button class="btn btn-outline" id="prevPage">Previous</button>
+                        <span class="pagination-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                        <button class="btn btn-outline" id="nextPage">Next</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Plans Section -->
+            <section id="plans" class="admin-section">
+                <div class="admin-header-row">
+                    <h2>Plan Management</h2>
+                    <button class="btn btn-primary" id="addPlanBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Plan
+                    </button>
+                </div>
+
+                <div class="plans-grid">
+                    <!-- Plans will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Credits Section -->
+            <section id="credits" class="admin-section">
+                <div class="admin-header-row">
+                    <h2>Credit Management</h2>
+                </div>
+
+                <div class="credit-actions">
+                    <div class="credit-card">
+                        <h3>Adjust Credits</h3>
+                        <div class="form-group">
+                            <label>User Email</label>
+                            <input type="email" id="creditUserEmail" class="form-input" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" id="creditAmount" class="form-input" placeholder="Enter amount...">
+                        </div>
+                        <div class="form-group">
+                            <label>Reason</label>
+                            <select id="creditReason" class="form-input">
+                                <option value="bonus">Bonus Credits</option>
+                                <option value="compensation">Compensation</option>
+                                <option value="adjustment">Manual Adjustment</option>
+                                <option value="promotion">Promotion</option>
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn btn-success" id="addCreditsBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Credits
+                            </button>
+                            <button class="btn btn-danger" id="removeCreditsBtn">
+                                <i class="fas fa-minus"></i>
+                                Remove Credits
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="credit-card">
+                        <h3>Recent Credit Changes</h3>
+                        <div class="credit-history" id="creditHistory">
+                            <!-- Credit history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="admin-section">
+                <div class="admin-header-row">
+                    <h2>Operation History</h2>
+                    <div class="admin-actions">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search operations..." id="historySearch">
+                        </div>
+                        <select class="form-select" id="historyType">
+                            <option value="all">All Operations</option>
+                            <option value="generate">Email Generation</option>
+                            <option value="verify">Email Verification</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Operation</th>
+                                <th>Credits</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyList">
+                            <!-- History will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="table-pagination">
+                        <button class="btn btn-outline" id="historyPrevPage">Previous</button>
+                        <span class="pagination-info">Page <span id="historyCurrentPage">1</span> of <span id="historyTotalPages">1</span></span>
+                        <button class="btn btn-outline" id="historyNextPage">Next</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="admin-section">
+                <div class="admin-header-row">
+                    <h2>System Settings</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>General Settings</h3>
+                        <div class="form-group">
+                            <label>Default Credits for New Users</label>
+                            <input type="number" id="defaultCredits" class="form-input" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Credit Cost per Operation</label>
+                            <input type="number" id="creditCost" class="form-input" value="1">
+                        </div>
+                        <button class="btn btn-primary" id="saveGeneralSettings">Save Changes</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Email Settings</h3>
+                        <div class="form-group">
+                            <label>SMTP Host</label>
+                            <input type="text" id="smtpHost" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>SMTP Port</label>
+                            <input type="number" id="smtpPort" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>SMTP User</label>
+                            <input type="text" id="smtpUser" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>SMTP Password</label>
+                            <input type="password" id="smtpPassword" class="form-input">
+                        </div>
+                        <button class="btn btn-primary" id="saveEmailSettings">Save Changes</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Security Settings</h3>
+                        <div class="form-group">
+                            <label>Session Timeout (minutes)</label>
+                            <input type="number" id="sessionTimeout" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Maximum Login Attempts</label>
+                            <input type="number" id="maxLoginAttempts" class="form-input">
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="requireMFA">
+                            <label>Require 2FA for Admin Access</label>
+                        </div>
+                        <button class="btn btn-primary" id="saveSecuritySettings">Save Changes</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit User</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="editName" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Plan</label>
+                    <select id="editPlan" class="form-input">
+                        <option value="free">Free</option>
+                        <option value="starter">Starter</option>
+                        <option value="pro">Pro</option>
+                        <option value="enterprise">Enterprise</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="editStatus" class="form-input">
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="deleted">Deleted</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="saveUserChanges">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/admin.js"></script>
+</body>
+</html>
