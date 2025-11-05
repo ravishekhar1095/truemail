@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>truemail.io — Admin Sign In</title>
+  <link rel="stylesheet" href="/enhanced-styles.css">
+  <link rel="stylesheet" href="/admin-styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body admin-login-body">
+  <div class="admin-login-wrapper">
+    <div class="admin-login-card">
+      <div class="admin-login-header">
+        <span class="brand">truemail.io</span>
+        <span class="badge admin-badge">Admin</span>
+      </div>
+      <h1>Administrator Sign In</h1>
+      <p class="admin-login-subtitle">Enter the credentials provided for the admin portal.</p>
+      <form id="adminLoginForm" class="admin-login-form">
+        <div class="form-group">
+          <label for="adminEmail">Email</label>
+          <input type="email" id="adminEmail" name="email" placeholder="admin@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" name="password" placeholder="••••••••" required>
+        </div>
+        <div class="form-footer">
+          <button type="submit" class="btn btn-primary" id="adminLoginBtn">
+            <span class="btn-text">Sign In</span>
+            <span class="loader hidden"></span>
+          </button>
+        </div>
+        <p class="admin-login-error" id="adminLoginError"></p>
+      </form>
+      <a class="admin-back-link" href="/">← Back to app</a>
+    </div>
+  </div>
+  <script src="/admin-login.js" type="module"></script>
+</body>
+</html>

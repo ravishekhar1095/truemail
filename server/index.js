@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const db = require('./db');
+const ADMIN_ROLES = ['admin', 'super_admin'];
 
 const app = express();
 app.use(cors());
@@ -119,18 +120,14 @@ async function filterValidEmails(patterns, domainInfo) {
     const mxHost = domainInfo.mxRecords[0].exchange;
     
     for (const email of uniquePatterns) {
-      const isValid = await checkEmailValidity(email, mxHost);
-      if (isValid) {
+      const validation = await checkEmailValidity(email, mxHost);
+      if (validation && validation.valid) {
         validEmails.push(email);
       }
     }
   } else if (domainInfo.hasA) {
     // If no MX but has A record, include all patterns but mark as unverified
-    validEmails.push(...uniquePatterns.map(email => ({
-      email,
-      status: 'unverified',
-      note: 'Domain exists but no MX records found'
-    })));
+    validEmails.push(...uniquePatterns.map(email => `${email} (unverified - domain has no MX records)`));
   }
 
   return validEmails;
@@ -256,6 +253,15 @@ async function checkEmailValidity(email, mxHost) {
 }
 
 // Admin routes
+app.get('/api/user/role', authMiddleware, (req, res) => {
+  res.json({
+    id: req.user.id,
+    email: req.user.email,
+    role: req.user.role || 'user',
+    account_status: req.user.account_status
+  });
+});
+
 app.get('/api/admin/dashboard', adminAuthMiddleware, async (req, res) => {
   try {
     const stats = await db.getAdminStats();
@@ -344,7 +350,7 @@ async function adminAuthMiddleware(req, res, next) {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const user = await db.findUserById(payload.userId);
-    if (!user || user.role !== 'admin') {
+    if (!user || !ADMIN_ROLES.includes(user.role)) {
       return res.status(403).json({ error: 'Admin access required' });
     }
     if (user.account_status !== 'active') {
@@ -379,10 +385,50 @@ app.post('/api/login', async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'email and password required' });
   const user = await db.findUserByEmail(email.toLowerCase());
   if (!user) return res.status(400).json({ error: 'invalid credentials' });
+  if (ADMIN_ROLES.includes(user.role)) {
+    return res.status(403).json({ error: 'Admin accounts must sign in through the admin portal.' });
+  }
   const ok = bcrypt.compareSync(password, user.password || user.passwordHash || user.password_hash);
   if (!ok) return res.status(400).json({ error: 'invalid credentials' });
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
   res.json({ token, user: { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name, credits_left: user.credits_left } });
+});
+
+app.post('/api/admin/login', async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ error: 'email and password required' });
+  }
+
+  try {
+    const user = await db.findUserByEmail(email.toLowerCase());
+    if (!user || !ADMIN_ROLES.includes(user.role)) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const ok = bcrypt.compareSync(password, user.password || user.passwordHash || user.password_hash);
+    if (!ok) {
+      return res.status(403).json({ error: 'Invalid admin credentials' });
+    }
+
+    if (user.account_status !== 'active') {
+      return res.status(403).json({ error: 'Account is not active' });
+    }
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Admin login failed' });
+  }
 });
 
 app.get('/api/me', authMiddleware, async (req, res) => {
