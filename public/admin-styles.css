@@ -215,6 +215,22 @@
     border-top: 1px solid #e2e8f0;
 }
 
+.plan-selector {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background: white;
+    font-size: 0.95rem;
+    color: #1e293b;
+}
+
+.plan-selector:focus {
+    outline: none;
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
 /* Admin Login */
 .admin-login-body {
     min-height: 100vh;

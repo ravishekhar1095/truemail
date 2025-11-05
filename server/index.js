@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const db = require('./db');
 const ADMIN_ROLES = ['admin', 'super_admin'];
@@ -22,6 +23,10 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Helpers
 const net = require('net');
+
+function generateTempPassword() {
+  return `Adm-${crypto.randomBytes(4).toString('hex')}`;
+}
 
 // Email format validation with stricter rules
 function isValidEmailFormat(email) {
@@ -312,6 +317,46 @@ app.post('/api/admin/users/:id/status', adminAuthMiddleware, async (req, res) =>
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update user status' });
+  }
+});
+
+app.post('/api/admin/users/:id/reset-password', adminAuthMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body || {};
+    const user = await db.findUserById(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const newPassword = (password && String(password).trim()) || generateTempPassword();
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+
+    const hash = bcrypt.hashSync(newPassword, 10);
+    await db.updateUserPassword(id, hash);
+    res.json({
+      password: newPassword,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+app.post('/api/admin/users/:id/plan', adminAuthMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { plan } = req.body;
+    if (!plan) return res.status(400).json({ error: 'Plan is required' });
+    const result = await db.updateUserPlan(id, plan);
+    res.json(result);
+  } catch (error) {
+    const message = error.message === 'invalid plan' ? error.message : 'Failed to update user plan';
+    res.status(error.message === 'invalid plan' ? 400 : 500).json({ error: message });
   }
 });
 

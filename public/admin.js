@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
       token: localStorage.getItem('adminToken'),
       page: 1,
       totalPages: 1,
-      pageSize: 10
+      pageSize: 10,
+      planOptions: ['free', 'starter', 'pro', 'enterprise']
     },
 
     async init() {
@@ -130,8 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'status':
             this.toggleUserStatus(userId, button.dataset.status || 'active');
             break;
+          case 'reset-password':
+            this.resetUserPassword(userId);
+            break;
           default:
             break;
+        }
+      });
+
+      this.elements.usersTable?.addEventListener('change', (event) => {
+        const select = event.target.closest('select.plan-selector');
+        if (!select) return;
+        const userId = select.dataset.userId;
+        const plan = select.value;
+        if (userId && plan) {
+          this.updateUserPlan(userId, plan, select);
         }
       });
     },
@@ -214,6 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const isActive = user.account_status ? user.account_status === 'active' : Boolean(user.active);
         const statusLabel = isActive ? 'Active' : 'Suspended';
         const currentStatus = isActive ? 'active' : 'suspended';
+        const currentPlan = (user.plan || 'free').toLowerCase();
+        const planOptions = this.state.planOptions.map(option => {
+          const value = option.toLowerCase();
+          const label = this.formatPlanLabel(value);
+          const selected = value === currentPlan ? 'selected' : '';
+          return `<option value="${value}" ${selected}>${label}</option>`;
+        }).join('');
 
         return `
           <tr>
@@ -223,7 +244,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="user-email">${user.email || '—'}</div>
               </div>
             </td>
-            <td>${user.plan || 'free'}</td>
+            <td>
+              <select class="plan-selector" data-user-id="${user.id}">
+                ${planOptions}
+              </select>
+            </td>
             <td>${(user.credits_left ?? user.credits ?? 0).toLocaleString()}</td>
             <td>
               <span class="badge ${isActive ? 'badge-success' : 'badge-warning'}">${statusLabel}</span>
@@ -233,6 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <button class="btn-sm btn-outline" data-action="credits" data-user-id="${user.id}" title="Adjust credits">
                 <i class="fas fa-coins"></i>
               </button>
+              <button class="btn-sm btn-outline" data-action="reset-password" data-user-id="${user.id}" title="Reset password">
+                <i class="fas fa-key"></i>
+              </button>
               <button class="btn-sm ${isActive ? 'btn-warning' : 'btn-success'}" data-action="status" data-status="${currentStatus}" data-user-id="${user.id}" title="${isActive ? 'Suspend user' : 'Activate user'}">
                 <i class="fas fa-${isActive ? 'ban' : 'check'}"></i>
               </button>
@@ -241,6 +269,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }).join('');
 
       this.elements.usersTable.innerHTML = rows;
+    },
+
+    formatPlanLabel(plan) {
+      if (!plan) return 'Free';
+      return plan.charAt(0).toUpperCase() + plan.slice(1);
     },
 
     updatePagination(pagination = {}) {
@@ -289,6 +322,44 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     },
 
+    async resetUserPassword(userId) {
+      const custom = window.prompt('Enter a new password, or leave blank to auto-generate:', '');
+      if (custom === null) return;
+
+      const payload = {};
+      const trimmed = custom.trim();
+      if (trimmed) {
+        if (trimmed.length < 8) {
+          this.showNotification('warning', 'Password must be at least 8 characters.');
+          return;
+        }
+        payload.password = trimmed;
+      }
+
+      try {
+        const data = await this.authFetch(`/api/admin/users/${userId}/reset-password`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const tempPassword = data.password;
+        if (tempPassword) {
+          try {
+            await navigator.clipboard.writeText(tempPassword);
+            this.showNotification('success', 'Password reset. Temporary password copied to clipboard.');
+          } catch (err) {
+            console.warn('Clipboard copy failed', err);
+            this.showNotification('success', 'Password reset. Copy the temporary password shown.');
+          }
+          window.prompt('Temporary password (copy now):', tempPassword);
+        } else {
+          this.showNotification('success', 'Password reset successfully.');
+        }
+      } catch (error) {
+        console.error('Failed to reset password:', error);
+        this.showNotification('error', error.message || 'Failed to reset password.');
+      }
+    },
+
     async toggleUserStatus(userId, currentStatus) {
       const nextStatus = currentStatus === 'active' ? 'suspended' : 'active';
       try {
@@ -301,6 +372,23 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         console.error('Failed to update user status:', error);
         this.showNotification('error', error.message || 'Failed to update user status.');
+      }
+    },
+
+    async updateUserPlan(userId, plan, selectEl) {
+      if (selectEl) selectEl.disabled = true;
+      try {
+        await this.authFetch(`/api/admin/users/${userId}/plan`, {
+          method: 'POST',
+          body: JSON.stringify({ plan })
+        });
+        this.showNotification('success', `Plan updated to ${this.formatPlanLabel(plan)}.`);
+        await Promise.all([this.loadUsers(this.state.page), this.loadStats()]);
+      } catch (error) {
+        console.error('Failed to update user plan:', error);
+        this.showNotification('error', error.message || 'Failed to update plan.');
+      } finally {
+        if (selectEl) selectEl.disabled = false;
       }
     },
 

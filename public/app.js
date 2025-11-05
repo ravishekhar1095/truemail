@@ -368,15 +368,15 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       
       async loadHistory() {
-        const lastOp = this.handlers.getLastOperation();
+        const lastOp = App.handlers.getLastOperation();
         if (lastOp && (Date.now() - lastOp.timestamp) < 3600000) { // Within last hour
           if (lastOp.type === 'generate') {
-            this.elements.genFirstNameInput.value = lastOp.data.first;
-            this.elements.genLastNameInput.value = lastOp.data.last;
-            this.elements.genDomainInput.value = lastOp.data.domain;
+            App.elements.genFirstNameInput.value = lastOp.data.first;
+            App.elements.genLastNameInput.value = lastOp.data.last;
+            App.elements.genDomainInput.value = lastOp.data.domain;
           } else if (lastOp.type === 'verify') {
-            this.elements.verifyEmailInput.value = lastOp.data.email;
-            this.elements.verifySmtpCheckbox.checked = lastOp.data.smtp;
+            App.elements.verifyEmailInput.value = lastOp.data.email;
+            App.elements.verifySmtpCheckbox.checked = lastOp.data.smtp;
           }
         }
       },

@@ -358,6 +358,34 @@ async function updateUserStatus(userId, status) {
   return findUserById(userId);
 }
 
+async function updateUserPassword(userId, passwordHash) {
+  if (!passwordHash) throw new Error('password hash required');
+  await execute(
+    `UPDATE users
+     SET password = ?, updated_at = CURRENT_TIMESTAMP
+     WHERE id = ?;`,
+    [passwordHash, userId]
+  );
+  return findUserById(userId);
+}
+
+async function updateUserPlan(userId, plan) {
+  const validPlans = new Set(['free', 'starter', 'pro', 'enterprise']);
+  const targetPlan = String(plan || '').toLowerCase();
+  if (!validPlans.has(targetPlan)) {
+    throw new Error('invalid plan');
+  }
+
+  await execute(
+    `UPDATE users
+     SET plan = ?, updated_at = CURRENT_TIMESTAMP
+     WHERE id = ?;`,
+    [targetPlan, userId]
+  );
+
+  return findUserById(userId);
+}
+
 async function getVerificationStats() {
   const { rows: totals } = await execute(
     `SELECT reason, COUNT(*) AS count
@@ -407,5 +435,7 @@ module.exports = {
   getUserCount,
   changeUserCredits,
   updateUserStatus,
+  updateUserPassword,
+  updateUserPlan,
   getVerificationStats
 };
