@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
       regBtn: document.getElementById('regBtn'),
       logoutBtn: document.getElementById('logoutBtn'),
       viewPlansBtn: document.getElementById('viewPlansBtn'),
+      heroUpgradeBtn: document.getElementById('heroUpgradeBtn'),
+      focusGenerateBtn: document.getElementById('focusGenerate'),
       genBtn: document.getElementById('genBtn'),
       verifyBtn: document.getElementById('verifyBtn'),
       closeModalBtn: document.getElementById('closeModalBtn'),
@@ -27,6 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
       userName: document.getElementById('userName'),
       userCredits: document.getElementById('userCredits'),
       navCredits: document.getElementById('navCredits'),
+      dashboardSubcopy: document.getElementById('dashboardSubcopy'),
+      summaryPlan: document.getElementById('summaryPlan'),
+      summaryStatus: document.getElementById('summaryStatus'),
+      summaryActivity: document.getElementById('summaryActivity'),
+      summaryCredits: document.getElementById('summaryCredits'),
+      activityTimestamp: document.getElementById('activityTimestamp'),
+      activityList: document.getElementById('activityList'),
+      insightsMessage: document.getElementById('insightsMessage'),
       // Inputs
       regNameInput: document.getElementById('regName'),
       regEmailInput: document.getElementById('regEmail'),
@@ -37,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       genLastNameInput: document.getElementById('last'),
       genDomainInput: document.getElementById('domain2'),
       verifyEmailInput: document.getElementById('email'),
-      verifySmtpCheckbox: document.getElementById('smtp'),
+      verifySmtpCheckbox: document.getElementById('smtp'), // Corrected reference to match HTML
       // Results & Status
       authStatus: document.getElementById('authStatus'),
       genResult: document.getElementById('genResult'),
@@ -49,11 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
     state: {
       token: localStorage.getItem('token'),
       user: null,
+      lastOperation: null,
     },
 
     init() {
+      this.state.lastOperation = this.handlers.getLastOperation();
       this.bindEvents();
       this.checkAuthStatus();
+      this.ui.updateLastActivity(this.state.lastOperation);
       this.handlers.loadHistory();
     },
 
@@ -73,6 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
       this.elements.purchasePlanBtns.forEach(btn => 
         btn.addEventListener('click', this.handlers.purchasePlan.bind(this))
       );
+      this.elements.heroUpgradeBtn?.addEventListener('click', () => this.ui.toggleModal(true));
+      this.elements.focusGenerateBtn?.addEventListener('click', () => {
+        const generatorCard = document.getElementById('generatorCard');
+        generatorCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => this.elements.genFirstNameInput?.focus(), 280);
+      });
     },
 
     async checkAuthStatus() {
@@ -84,9 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
           this.state.token = null;
           localStorage.removeItem('token');
+          this.state.user = null;
+          this.state.lastOperation = null;
+          this.ui.resetDashboard();
           this.ui.showAuth();
         }
       } else {
+        this.state.user = null;
+        this.state.lastOperation = null;
+        this.ui.resetDashboard();
         this.ui.showAuth();
       }
     },
@@ -134,6 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => notification.remove(), 300);
         }, 3000);
       },
+      escapeHtml(value) {
+        if (value === undefined || value === null) return '';
+        return value.toString().replace(/[&<>"']/g, (match) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[match]));
+      },
       
       toggleLoading(buttonId, isLoading) {
         const button = App.elements[buttonId];
@@ -149,8 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
         App.elements.authStatus.textContent = '';
       },
       updateCredits(credits) {
-        App.elements.userCredits.textContent = credits;
-        App.elements.navCredits.textContent = credits;
+        const rawAmount = Number(credits ?? 0);
+        const amount = Number.isFinite(rawAmount) ? rawAmount : 0;
+        const formatted = amount.toLocaleString();
+        App.elements.userCredits.textContent = formatted;
+        App.elements.navCredits.textContent = formatted;
+        if (App.state.user) {
+          App.state.user.credits_left = amount;
+          this.updateSummary(App.state.user);
+          this.updateInsights(App.state.user);
+        } else if (App.elements.summaryCredits) {
+          App.elements.summaryCredits.textContent = formatted;
+        }
       },
       showAuth() {
         App.elements.authCard.classList.remove('hidden');
@@ -159,12 +204,155 @@ document.addEventListener('DOMContentLoaded', () => {
         App.elements.navUserInfo.classList.add('hidden');
       },
       showDashboard(user) {
+        App.state.user = { ...(App.state.user || {}), ...user };
+        App.state.user.plan = App.state.user.plan || 'free';
+        App.state.user.account_status = App.state.user.account_status || 'active';
+        App.state.user.credits_left = Number(App.state.user.credits_left ?? 0);
         App.elements.authCard.classList.add('hidden');
         App.elements.dashboard.classList.remove('hidden');
         App.elements.dashboardLink.classList.remove('hidden');
         App.elements.navUserInfo.classList.remove('hidden');
-        App.elements.userName.textContent = user.name || user.email;
-        this.updateCredits(user.credits_left);
+        const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.name || user.email;
+        App.elements.userName.textContent = displayName;
+        this.updateCredits(App.state.user?.credits_left ?? 0);
+        this.updateLastActivity(App.state.lastOperation);
+      },
+      updateSummary(user) {
+        const defaultSubcopy = 'Keep track of the connections you discover and the emails you verify.';
+        if (!user) {
+          if (App.elements.summaryCredits) App.elements.summaryCredits.textContent = '0';
+          if (App.elements.summaryPlan) App.elements.summaryPlan.textContent = 'Free';
+          if (App.elements.summaryStatus) {
+            App.elements.summaryStatus.textContent = 'Active';
+            App.elements.summaryStatus.classList.remove('suspended');
+          }
+          if (App.elements.summaryActivity) App.elements.summaryActivity.textContent = 'No activity yet';
+          if (App.elements.activityTimestamp) App.elements.activityTimestamp.textContent = 'Run your first search to see history here.';
+          if (App.elements.dashboardSubcopy) App.elements.dashboardSubcopy.textContent = defaultSubcopy;
+          return;
+        }
+
+        const rawCredits = Number(user.credits_left ?? 0);
+        const credits = Number.isFinite(rawCredits) ? rawCredits : 0;
+        if (App.elements.summaryCredits) App.elements.summaryCredits.textContent = credits.toLocaleString();
+
+        const plan = ((user.plan && user.plan.toString()) || 'free').toLowerCase();
+        if (App.elements.summaryPlan) {
+          const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+          App.elements.summaryPlan.textContent = planLabel;
+        }
+
+        if (App.elements.summaryStatus) {
+          const status = (user.account_status || 'active').toLowerCase();
+          const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+          App.elements.summaryStatus.textContent = statusLabel;
+          if (status === 'active') {
+            App.elements.summaryStatus.classList.remove('suspended');
+          } else {
+            App.elements.summaryStatus.classList.add('suspended');
+          }
+        }
+
+        if (App.elements.dashboardSubcopy) {
+          let message;
+          if (credits <= 1) {
+            message = 'You are running low on credits. Consider upgrading before your next campaign.';
+          } else if (plan === 'free') {
+            message = `You have ${credits} credits ready—upgrade when you need more reach.`;
+          } else {
+            const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+            message = `You have ${credits} credits available on your ${planLabel} plan.`;
+          }
+          App.elements.dashboardSubcopy.textContent = message;
+        }
+      },
+      updateInsights(user) {
+        if (!App.elements.insightsMessage) return;
+        const defaultMessage = 'You’re on the free plan—upgrade to unlock higher credit limits and CSV workflows.';
+        if (!user) {
+          App.elements.insightsMessage.textContent = defaultMessage;
+          return;
+        }
+
+        const credits = Number(user.credits_left ?? 0);
+        const plan = ((user.plan && user.plan.toString()) || 'free').toLowerCase();
+        let message = defaultMessage;
+
+        if (credits <= 1) {
+          message = 'You are almost out of credits—top up or upgrade to keep your outreach running.';
+        } else if (plan !== 'free') {
+          const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+          message = `You’re on the ${planLabel} plan—track usage to make the most of your tier.`;
+        }
+
+        App.elements.insightsMessage.textContent = message;
+      },
+      updateLastActivity(activity) {
+        const defaultSummary = 'No activity yet';
+        const defaultTimestamp = 'Run your first search to see history here.';
+
+        if (!activity) {
+          if (App.elements.summaryActivity) App.elements.summaryActivity.textContent = defaultSummary;
+          if (App.elements.activityTimestamp) App.elements.activityTimestamp.textContent = defaultTimestamp;
+          if (App.elements.activityList) {
+            App.elements.activityList.innerHTML = `
+              <li class="activity-item empty">
+                <i class="fas fa-rocket"></i>
+                <div>
+                  <strong>${defaultSummary}</strong>
+                  <span>Generate or verify an email to populate this timeline.</span>
+                </div>
+              </li>
+            `;
+          }
+          return;
+        }
+
+        const type = activity.type;
+        const timestamp = new Date(activity.timestamp || Date.now());
+        const formatted = `${timestamp.toLocaleDateString()} · ${timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+        let label;
+        let detailText;
+        let icon;
+
+        if (type === 'generate') {
+          label = 'Generated email patterns';
+          icon = 'fa-magic';
+          const first = activity.data?.first || '';
+          const last = activity.data?.last || '';
+          const domain = activity.data?.domain || '';
+          const name = [first, last].filter(Boolean).join(' ').trim();
+          detailText = [name, domain].filter(Boolean).join(' · ') || 'Patterns created';
+        } else {
+          label = 'Verified an email';
+          icon = 'fa-shield-alt';
+          detailText = activity.data?.email || 'Verification run';
+        }
+
+        if (App.elements.summaryActivity) App.elements.summaryActivity.textContent = label;
+        if (App.elements.activityTimestamp) App.elements.activityTimestamp.textContent = formatted;
+
+        if (App.elements.activityList) {
+          const safeDetail = this.escapeHtml(detailText);
+          App.elements.activityList.innerHTML = `
+            <li class="activity-item">
+              <i class="fas ${icon}"></i>
+              <div>
+                <strong>${label}</strong>
+                <span>${safeDetail}</span>
+              </div>
+            </li>
+          `;
+        }
+      },
+      resetDashboard() {
+        if (App.elements.userName) App.elements.userName.textContent = 'User';
+        if (App.elements.userCredits) App.elements.userCredits.textContent = '0';
+        if (App.elements.navCredits) App.elements.navCredits.textContent = '0';
+        this.updateSummary(null);
+        this.updateInsights(null);
+        this.updateLastActivity(null);
       },
       switchTab(tabName) {
         App.elements.tabButtons.forEach(btn => {
@@ -217,12 +405,29 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>`).join('');
       },
       formatVerifyResult(result) {
+        const getIcon = (isValid) => isValid ? 'fa-check success' : 'fa-times error';
+        const getStatus = (value) => value === null ? 'fa-question' : getIcon(value);
+
         return `
           <div class="verification-result">
-            <div class="result-item ${result.formatValid ? 'success' : 'error'}"><span><i class="fas fa-${result.formatValid ? 'check' : 'times'}"></i> Format Valid</span></div>
-            <div class="result-item ${result.mxFound ? 'success' : 'error'}"><span><i class="fas fa-${result.mxFound ? 'check' : 'times'}"></i> MX Records Found</span></div>
-            ${result.smtpConnect !== null ? `<div class="result-item ${result.smtpConnect ? 'success' : 'error'}"><span><i class="fas fa-${result.smtpConnect ? 'check' : 'times'}"></i> SMTP Connection</span></div>` : ''}
-            ${result.info ? `<div class="info">${result.info}</div>` : ''}
+            <div class="result-grid">
+              <div class="result-item"><span><i class="fas ${getIcon(result.formatValid)}"></i> Format</span></div>
+              <div class="result-item"><span><i class="fas ${getIcon(result.domain.valid)}"></i> Domain</span></div>
+              <div class="result-item"><span><i class="fas ${getIcon(result.domain.hasMX)}"></i> MX Record</span></div>
+              <div class="result-item"><span><i class="fas ${getStatus(result.mailbox.exists)}"></i> Mailbox</span></div>
+              <div class="result-item"><span><i class="fas ${getIcon(!result.role_based)}"></i> Not Role-Based</span></div>
+              <div class="result-item"><span><i class="fas ${getStatus(result.mailbox.catch_all === false)}"></i> No Catch-All</span></div>
+            </div>
+            <div class="result-summary">
+              <div class="score-container">
+                <div class="score-label">Confidence Score</div>
+                <div class="score-value">${result.score}/100</div>
+              </div>
+              ${result.suggestion ? `<div class="suggestion-box"><strong>Suggestion:</strong> ${result.suggestion}</div>` : ''}
+              ${result.info && result.info.length > 0 ? `<div class="info-box">
+                ${result.info.map(i => `<div>- ${i}</div>`).join('')}
+              </div>` : ''}
+            </div>
           </div>`;
       }
     },
@@ -234,7 +439,10 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       
       setLastOperation(type, data) {
-        localStorage.setItem('lastOperation', JSON.stringify({ type, data, timestamp: Date.now() }));
+        const payload = { type, data, timestamp: Date.now() };
+        localStorage.setItem('lastOperation', JSON.stringify(payload));
+        App.state.lastOperation = payload;
+        App.ui.updateLastActivity(payload);
       },
 
       getLastOperation() {
@@ -276,6 +484,8 @@ document.addEventListener('DOMContentLoaded', () => {
       logout() {
         this.handlers.setToken(null);
         this.state.user = null;
+        this.state.lastOperation = null;
+        this.ui.resetDashboard();
         this.ui.showAuth();
       },
       async generateEmails() {
@@ -307,14 +517,17 @@ document.addEventListener('DOMContentLoaded', () => {
             first: data.first,
             last: data.last,
             domain: data.domain,
-            results: response.emails
+            results: [...response.valid_emails, ...response.other_patterns]
           });
           
-          this.ui.renderResult(this.elements.genResult, this.ui.formatEmailResults(response.emails));
+          const all_emails = [...response.valid_emails, ...response.other_patterns];
+          this.ui.renderResult(this.elements.genResult, this.ui.formatEmailResults(all_emails));
           this.ui.updateCredits(response.credits_left);
           
           // Show success notification
-          this.ui.showNotification('success', `Generated ${response.emails.length} email patterns`);
+          const message = response.valid_emails.length > 0 ? `Found ${response.valid_emails.length} valid email(s)!` : `Generated ${all_emails.length} possible patterns.`;
+          const status = response.valid_emails.length > 0 ? 'success' : 'info';
+          this.ui.showNotification(status, message);
         } catch (error) {
           this.ui.renderResult(this.elements.genResult, `<div class="error-message">${error.message}</div>`);
           this.ui.showNotification('error', error.message);
@@ -334,7 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         
-        const data = { email, smtp: this.elements.verifySmtpCheckbox.checked };
+        const data = { email, deep: this.elements.verifySmtpCheckbox ? this.elements.verifySmtpCheckbox.checked : false };
         
         try {
           this.ui.renderResult(this.elements.verifyResult, `
@@ -348,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Store operation history
           this.handlers.setLastOperation('verify', {
             email: email,
-            smtp: data.smtp,
+            deep: data.deep,
             result: response
           });
           
@@ -356,10 +569,10 @@ document.addEventListener('DOMContentLoaded', () => {
           this.ui.updateCredits(response.credits_left);
           
           // Show appropriate notification
-          const status = response.formatValid && response.mxFound ? 'success' : 'warning';
-          const message = response.formatValid && response.mxFound ? 
+          const status = response.score > 70 ? 'success' : 'warning';
+          const message = response.score > 70 ? 
             'Email verification completed successfully' : 
-            'Email verification completed with some issues';
+            'Verification complete; review the results for details';
           this.ui.showNotification(status, message);
         } catch (error) {
           this.ui.renderResult(this.elements.verifyResult, `<div class="error-message">${error.message}</div>`);
@@ -369,16 +582,23 @@ document.addEventListener('DOMContentLoaded', () => {
       
       async loadHistory() {
         const lastOp = App.handlers.getLastOperation();
-        if (lastOp && (Date.now() - lastOp.timestamp) < 3600000) { // Within last hour
+        const isFresh = lastOp && (Date.now() - lastOp.timestamp) < 3600000;
+
+        if (isFresh) {
           if (lastOp.type === 'generate') {
-            App.elements.genFirstNameInput.value = lastOp.data.first;
-            App.elements.genLastNameInput.value = lastOp.data.last;
-            App.elements.genDomainInput.value = lastOp.data.domain;
+            if (App.elements.genFirstNameInput) App.elements.genFirstNameInput.value = lastOp.data.first || '';
+            if (App.elements.genLastNameInput) App.elements.genLastNameInput.value = lastOp.data.last || '';
+            if (App.elements.genDomainInput) App.elements.genDomainInput.value = lastOp.data.domain || '';
           } else if (lastOp.type === 'verify') {
-            App.elements.verifyEmailInput.value = lastOp.data.email;
-            App.elements.verifySmtpCheckbox.checked = lastOp.data.smtp;
+            if (App.elements.verifyEmailInput) App.elements.verifyEmailInput.value = lastOp.data.email || '';
+            if (App.elements.verifySmtpCheckbox) App.elements.verifySmtpCheckbox.checked = Boolean(lastOp.data.deep);
           }
+          App.state.lastOperation = lastOp;
+        } else {
+          App.state.lastOperation = null;
         }
+
+        App.ui.updateLastActivity(App.state.lastOperation);
       },
       purchasePlan(e) {
         const plan = e.currentTarget.dataset.plan;

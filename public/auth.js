@@ -35,13 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const showInputError = (input, message) => {
             const errorDiv = input.parentElement.parentElement.querySelector('.error-message');
-            errorDiv.textContent = message;
+            if (errorDiv) {
+                errorDiv.textContent = message;
+            }
             input.classList.add('input-error');
         };
 
         const clearInputError = (input) => {
             const errorDiv = input.parentElement.parentElement.querySelector('.error-message');
-            errorDiv.textContent = '';
+            if (errorDiv) {
+                errorDiv.textContent = '';
+            }
             input.classList.remove('input-error');
         };
 

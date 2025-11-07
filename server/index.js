@@ -36,25 +36,25 @@ function isValidEmailFormat(email) {
 
 // Domain validation helper
 async function validateDomain(domain) {
-  try {
-    // Check domain format
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/.test(domain)) {
-      return { isValid: false, error: 'Invalid domain format' };
-    }
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/.test(domain)) {
+    return { isValid: false, error: 'Invalid domain format', domain };
+  }
 
-    // Resolve MX records
-    const mxRecords = await dns.resolveMx(domain);
-    
-    // Resolve A records as backup
-    const aRecords = await dns.resolve(domain).catch(() => []);
-    
-    // Get domain info (TXT records might contain email patterns)
-    const txtRecords = await dns.resolveTxt(domain).catch(() => []);
+  try {
+    const [mxRecords, aRecords, txtRecords] = await Promise.all([
+      dns.resolveMx(domain).catch(() => []),
+      dns.resolve(domain).catch(() => []),
+      dns.resolveTxt(domain).catch(() => [])
+    ]);
+
+    const hasMx = mxRecords && mxRecords.length > 0;
+    const hasA = aRecords && aRecords.length > 0;
 
     return {
-      isValid: true,
-      hasMX: mxRecords && mxRecords.length > 0,
-      hasA: aRecords && aRecords.length > 0,
+      // A domain is valid for email if it has MX or A records.
+      isValid: hasMx || hasA,
+      hasMX: hasMx,
+      hasA: hasA,
       mxRecords: mxRecords || [],
       aRecords: aRecords || [],
       txtRecords: txtRecords || [],
@@ -80,21 +80,28 @@ async function generateEmailPatterns({ first, last, domain, company }) {
     // First + Last variations
     patterns.add(`${F}.${L}@${domain}`);
     patterns.add(`${F}${L}@${domain}`);
+    patterns.add(`${L}.${F}@${domain}`);
     patterns.add(`${F}_${L}@${domain}`);
     patterns.add(`${F}-${L}@${domain}`);
     patterns.add(`${F[0]}${L}@${domain}`);
+    patterns.add(`${F[0]}.${L}@${domain}`);
     
     // Last + First variations
-    patterns.add(`${L}.${F}@${domain}`);
     patterns.add(`${L}${F}@${domain}`);
     patterns.add(`${L}_${F}@${domain}`);
+    patterns.add(`${L[0]}${F}@${domain}`);
     
     // Initial variations
     patterns.add(`${F[0]}${L[0]}@${domain}`);
     patterns.add(`${F[0]}.${L[0]}@${domain}`);
+    patterns.add(`${F}${L[0]}@${domain}`);
+    patterns.add(`${F}.${L[0]}@${domain}`);
     
     // First name only
     patterns.add(`${F}@${domain}`);
+
+    // Last name only
+    patterns.add(`${L}@${domain}`);
     
     // With numbers (for common names)
     patterns.add(`${F}${L}1@${domain}`);
@@ -113,29 +120,6 @@ async function generateEmailPatterns({ first, last, domain, company }) {
   }
 
   return Array.from(patterns);
-}
-
-// Filter valid emails based on SMTP checks and common patterns
-async function filterValidEmails(patterns, domainInfo) {
-  const validEmails = [];
-  const uniquePatterns = Array.from(new Set(patterns));
-
-  // If domain has MX records, attempt SMTP validation
-  if (domainInfo.hasMX) {
-    const mxHost = domainInfo.mxRecords[0].exchange;
-    
-    for (const email of uniquePatterns) {
-      const validation = await checkEmailValidity(email, mxHost);
-      if (validation && validation.valid) {
-        validEmails.push(email);
-      }
-    }
-  } else if (domainInfo.hasA) {
-    // If no MX but has A record, include all patterns but mark as unverified
-    validEmails.push(...uniquePatterns.map(email => `${email} (unverified - domain has no MX records)`));
-  }
-
-  return validEmails;
 }
 
 // Enhanced SMTP verification with proper handshake and response parsing
@@ -164,12 +148,12 @@ async function checkEmailValidity(email, mxHost) {
           socket.write(`HELO ${require('os').hostname()}\r\n`);
           break;
         case 2: // After HELO (250)
-          socket.write(`MAIL FROM:<verify@yourdomain.com>\r\n`);
+          socket.write(`MAIL FROM:<verifier@example.org>\r\n`);
           break;
         case 3: // After MAIL FROM (250)
           socket.write(`RCPT TO:<${email}>\r\n`);
           break;
-        case 4: // After RCPT TO (250, 550, etc)
+        case 4: // After RCPT TO
           socket.write('QUIT\r\n');
           break;
         default:
@@ -191,35 +175,41 @@ async function checkEmailValidity(email, mxHost) {
       buffer += data.toString();
       
       // Process complete lines
-      let lines = buffer.split('\r\n');
-      buffer = lines.pop(); // Keep incomplete line in buffer
+      while (buffer.includes('\r\n')) {
+        const lineEnd = buffer.indexOf('\r\n');
+        const line = buffer.substring(0, lineEnd);
+        buffer = buffer.substring(lineEnd + 2);
       
-      for (let line of lines) {
         console.log(`SMTP ${stages[stage]} <`, line);
         
         // Parse SMTP response code
         const code = parseInt(line.substr(0, 3));
+        const isLastLineOfResponse = line.charAt(3) === ' ';
+
+        if (!isLastLineOfResponse) continue; // Wait for the final line of a multi-line response
         
         switch(stage) {
           case 0: // Expect 220 (Service ready)
             if (code === 220) processNext();
-            else hasError = true;
+            else { hasError = true; resolve({ valid: false, reason: `Unexpected connection response (${code}): ${line}` }); }
             break;
             
           case 1: // Expect 250 (HELO ok)
             if (code === 250) processNext();
-            else hasError = true;
+            else { hasError = true; resolve({ valid: false, reason: `HELO failed (${code}): ${line}` }); }
             break;
             
           case 2: // Expect 250 (MAIL FROM ok)
             if (code === 250) processNext();
-            else hasError = true;
+            else { hasError = true; resolve({ valid: false, reason: `MAIL FROM failed (${code}): ${line}` }); }
             break;
             
           case 3: // Check RCPT TO response
             if (code === 250) {
               resolve({ valid: true, reason: 'Mailbox exists' });
             } else if (code === 550 || code === 553 || code === 501 || code === 554) {
+              resolve({ valid: false, reason: `Invalid mailbox or recipient rejected (${code}): ${line}` });
+            } else if (code === 551 || code === 571 || (code >= 400 && code < 500)) {
               resolve({ valid: false, reason: `Invalid mailbox (${code}): ${line}` });
             } else {
               resolve({ valid: false, reason: `Unexpected response (${code}): ${line}` });
@@ -229,7 +219,6 @@ async function checkEmailValidity(email, mxHost) {
         }
         
         if (hasError) {
-          resolve({ valid: false, reason: `Error at ${stages[stage]}: ${line}` });
           socket.destroy();
           return;
         }
@@ -239,6 +228,7 @@ async function checkEmailValidity(email, mxHost) {
     socket.on('error', (err) => {
       console.error('SMTP connection error:', err.message);
       resolve({ valid: false, reason: `Connection error: ${err.message}` });
+      if (timeout) clearTimeout(timeout);
       socket.destroy();
     });
 
@@ -246,6 +236,7 @@ async function checkEmailValidity(email, mxHost) {
       console.log('SMTP connection timeout');
       resolve({ valid: false, reason: 'Connection timeout' });
       socket.destroy();
+      if (timeout) clearTimeout(timeout);
     });
 
     socket.on('end', () => {
@@ -350,7 +341,7 @@ app.post('/api/admin/users/:id/reset-password', adminAuthMiddleware, async (req,
 app.post('/api/admin/users/:id/plan', adminAuthMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    const { plan } = req.body;
+    const { plan } = req.body || {};
     if (!plan) return res.status(400).json({ error: 'Plan is required' });
     const result = await db.updateUserPlan(id, plan);
     res.json(result);
@@ -534,11 +525,28 @@ app.post('/api/generate', authMiddleware, async (req, res, next) => {
       company: company.trim()
     });
 
-    // Filter patterns based on common email conventions
-    const filteredEmails = await filterValidEmails(patterns, domainInfo);
+    const valid_emails = [];
+    const other_patterns = [];
+
+    // If domain has an MX record, try to validate each pattern
+    if (domainInfo.hasMX && domainInfo.mxRecords.length > 0) {
+      const mxHost = domainInfo.mxRecords[0].exchange;
+      for (const email of patterns) {
+        const check = await checkEmailValidity(email, mxHost);
+        if (check.valid) {
+          valid_emails.push(email);
+        } else {
+          other_patterns.push(email);
+        }
+      }
+    } else {
+      // If no MX record, return all patterns as unverified
+      other_patterns.push(...patterns);
+    }
 
     res.json({ 
-      emails: filteredEmails,
+      valid_emails,
+      other_patterns,
       domain_info: domainInfo,
       credits_left: req.user.credits_left 
     });
@@ -629,13 +637,13 @@ app.post('/api/verify', authMiddleware, async (req, res, next) => {
       
       // Check if mailbox exists
       const mailboxCheck = await checkEmailValidity(email, mxHost);
-      result.mailbox.exists = mailboxCheck;
+      result.mailbox.exists = mailboxCheck.valid;
       
       // Check for catch-all
-      if (mailboxCheck) {
+      if (mailboxCheck.valid) {
         const randomEmail = `test${Date.now()}@${domain}`;
         const catchAllCheck = await checkEmailValidity(randomEmail, mxHost);
-        result.mailbox.catch_all = catchAllCheck;
+        result.mailbox.catch_all = catchAllCheck.valid;
       }
     }
 
