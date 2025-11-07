@@ -92,6 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
         generatorCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setTimeout(() => this.elements.genFirstNameInput?.focus(), 280);
       });
+
+      // Event delegation for dynamic content (e.g., copy buttons)
+      this.elements.genResult.addEventListener('click', (e) => {
+        const copyBtn = e.target.closest('.copy-email-btn');
+        if (copyBtn) {
+          const email = copyBtn.dataset.email;
+          navigator.clipboard.writeText(email);
+          this.ui.showNotification('success', `Copied: ${this.ui.escapeHtml(email)}`);
+        }
+      });
     },
 
     async checkAuthStatus() {
@@ -125,8 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
           ...(App.state.token && { 'Authorization': `Bearer ${App.state.token}` }),
         };
 
+        const fullPath = `${window.AppConfig.API_BASE_URL}${path}`;
+
         try {
-          const response = await fetch(path, { ...options, headers });
+          const response = await fetch(fullPath, { ...options, headers });
           const data = await response.json();
 
           if (!response.ok) {
@@ -396,13 +408,16 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       formatEmailResults(emails) {
         if (!emails || emails.length === 0) return '<p>No email patterns generated.</p>';
-        return emails.map(email => `
-          <div class="result-item">
-            <span>${email}</span>
-            <button class="btn btn-outline" onclick="navigator.clipboard.writeText('${email}')" title="Copy email">
-              <i class="fas fa-copy"></i>
-            </button>
-          </div>`).join('');
+        return emails.map(email => {
+          const safeEmail = this.escapeHtml(email);
+          return `
+            <div class="result-item">
+              <span>${safeEmail}</span>
+              <button class="btn btn-outline copy-email-btn" data-email="${safeEmail}" title="Copy email">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>`;
+        }).join('');
       },
       formatVerifyResult(result) {
         const getIcon = (isValid) => isValid ? 'fa-check success' : 'fa-times error';

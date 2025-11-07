@@ -67,67 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-
-        // Form submission validation
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                const email = document.getElementById('loginEmail');
-                const password = document.getElementById('loginPassword');
-                let isValid = true;
-
-                if (!validateEmail(email.value)) {
-                    showInputError(email, 'Please enter a valid email address');
-                    isValid = false;
-                }
-
-                if (!password.value) {
-                    showInputError(password, 'Password is required');
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-        }
-
-        if (registerForm) {
-            registerForm.addEventListener('submit', (e) => {
-                const name = document.getElementById('regName');
-                const email = document.getElementById('regEmail');
-                const password = document.getElementById('regPassword');
-                const agreeTerms = document.getElementById('agreeTerms');
-                let isValid = true;
-
-                if (!name.value.trim()) {
-                    showInputError(name, 'Name is required');
-                    isValid = false;
-                }
-
-                if (!validateEmail(email.value)) {
-                    showInputError(email, 'Please enter a valid email address');
-                    isValid = false;
-                }
-
-                if (!validatePassword(password.value)) {
-                    showInputError(password, 'Password must be at least 8 characters long');
-                    isValid = false;
-                }
-
-                if (agreeTerms && !agreeTerms.checked) {
-                    const termsError = document.querySelector('.terms-group .error-message');
-                    termsError.textContent = 'You must agree to the Terms of Service';
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-        }
     };
 
     // Form animations

@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
         headers['Content-Type'] = 'application/json';
       }
 
-      const response = await fetch(url, { ...options, headers });
+      const fullUrl = `${window.AppConfig.API_BASE_URL}${url}`;
+      const response = await fetch(fullUrl, { ...options, headers });
 
       if (response.status === 401) {
         this.logout();

@@ -196,219 +196,134 @@
         </section>
 
         <!-- Dashboard -->
-        <section id="dashboard" class="dashboard-container hidden">
-            <div class="dashboard-hero">
-                <div class="hero-main">
-                    <p class="hero-eyebrow">Dashboard</p>
-                    <h2 class="hero-title">Welcome back, <span id="userName">User</span></h2>
-                    <p id="dashboardSubcopy" class="hero-subtitle">Keep track of the connections you discover and the emails you verify.</p>
-                    <div class="hero-actions">
-                        <button id="focusGenerate" class="btn btn-light-outline">
-                            <i class="fas fa-magic"></i>
-                            Start a search
-                        </button>
-                        <button id="heroUpgradeBtn" class="btn btn-primary btn-glow">
-                            <i class="fas fa-crown"></i>
-                            Upgrade plan
-                        </button>
-                    </div>
+        <section id="dashboard" class="hidden">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <h2 class="user-name">Welcome, <span id="userName">User</span></h2>
+                    <p class="text-light">Let's find some emails!</p>
                 </div>
-                <div class="hero-summary">
-                    <div class="hero-credit">
-                        <span class="credit-label">Credits available</span>
-                        <span class="credit-value" id="userCredits">0</span>
-                        <span class="credit-helper">Use credits to generate or verify professional email addresses.</span>
-                    </div>
+                <div class="credit-badge">
+                    <i class="fas fa-coins"></i>
+                    <span id="userCredits">0</span> credits
                 </div>
             </div>
 
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <span class="summary-label">Current plan</span>
-                    <span class="summary-value" id="summaryPlan">Free</span>
-                    <span class="summary-foot">Unlock more capacity when you upgrade.</span>
-                </div>
-                <div class="summary-card">
-                    <span class="summary-label">Account status</span>
-                    <span class="summary-value status-pill" id="summaryStatus">Active</span>
-                    <span class="summary-foot">Stay active to keep generating email intelligence.</span>
-                </div>
-                <div class="summary-card">
-                    <span class="summary-label">Recent activity</span>
-                    <span class="summary-value" id="summaryActivity">No activity yet</span>
-                    <span class="summary-foot" id="activityTimestamp">Run your first search to see history here.</span>
-                </div>
-                <div class="summary-card">
-                    <span class="summary-label">Credits remaining</span>
-                    <span class="summary-value" id="summaryCredits">0</span>
-                    <span class="summary-foot">Balance updates automatically after each action.</span>
-                </div>
-            </div>
-
-            <div class="dashboard-layout">
-                <div class="layout-main">
-                    <!-- Email Generator -->
-                    <div class="dashboard-card" id="generatorCard">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-at"></i>
+            <div class="dashboard-grid">
+                <!-- Email Generator -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-at"></i>
+                            Generate Emails
+                        </h3>
+                        <span class="text-muted">1 credit per search</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">First Name</label>
+                                <input type="text" id="first" class="form-input" placeholder="John">
+                            </div>
+                            <div>
+                                <label class="form-label">Last Name</label>
+                                <input type="text" id="last" class="form-input" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Domain</label>
+                            <input type="text" id="domain2" class="form-input" placeholder="company.com">
+                        </div>
+                        <button id="genBtn" class="btn btn-primary mt-4">
+                            <span class="btn-text">
+                                <i class="fas fa-search"></i>
                                 Generate Emails
-                            </h3>
-                            <span class="text-muted">1 credit per search</span>
-                        </div>
-                        <div class="card-content">
-                            <div class="form-row">
-                                <div>
-                                    <label class="form-label">First Name</label>
-                                    <input type="text" id="first" class="form-input" placeholder="John">
-                                </div>
-                                <div>
-                                    <label class="form-label">Last Name</label>
-                                    <input type="text" id="last" class="form-input" placeholder="Doe">
-                                </div>
-                            </div>
-                            <div class="form-group mt-4">
-                                <label class="form-label">Domain</label>
-                                <input type="text" id="domain2" class="form-input" placeholder="company.com">
-                            </div>
-                            <button id="genBtn" class="btn btn-primary mt-4">
-                                <span class="btn-text">
-                                    <i class="fas fa-search"></i>
-                                    Generate Emails
-                                </span>
-                                <i class="fas fa-spinner fa-spin loader hidden"></i>
-                            </button>
-                        </div>
-                        <div id="genResult" class="result-container"></div>
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
                     </div>
+                    <div id="genResult" class="result-container"></div>
+                </div>
 
-                    <!-- Email Verifier -->
-                    <div class="dashboard-card" id="verifierCard">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-check-circle"></i>
+                <!-- Email Verifier -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-check-circle"></i>
+                            Verify Email
+                        </h3>
+                        <span class="text-muted">1 credit per verification</span>
+                    </div>
+                    <div class="card-content">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="email@domain.com">
+                        <div class="form-check mt-4">
+                            <label class="form-check-label">
+                                <input type="checkbox" id="smtp">
+                                <span>Try SMTP connect (may be blocked)</span>
+                            </label>
+                        </div>
+                        <button id="verifyBtn" class="btn btn-primary mt-4">
+                            <span class="btn-text">
+                                <i class="fas fa-shield-alt"></i>
                                 Verify Email
-                            </h3>
-                            <span class="text-muted">1 credit per verification</span>
-                        </div>
-                        <div class="card-content">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" id="email" class="form-input" placeholder="email@domain.com">
-                            <div class="form-check mt-4">
-                                <label class="form-check-label">
-                                    <input type="checkbox" id="smtp">
-                                    <span>Try SMTP connect (may be blocked)</span>
-                                </label>
-                            </div>
-                            <button id="verifyBtn" class="btn btn-primary mt-4">
-                                <span class="btn-text">
-                                    <i class="fas fa-shield-alt"></i>
-                                    Verify Email
-                                </span>
-                                <i class="fas fa-spinner fa-spin loader hidden"></i>
-                            </button>
-                        </div>
-                        <div id="verifyResult" class="result-container"></div>
+                            </span>
+                            <i class="fas fa-spinner fa-spin loader hidden"></i>
+                        </button>
                     </div>
+                    <div id="verifyResult" class="result-container"></div>
+                </div>
 
-                    <!-- Bulk Operations (Placeholder) -->
-                    <div class="dashboard-card disabled">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-layer-group"></i>
-                                Bulk Processing
-                            </h3>
-                            <span class="badge-pro">Pro Plan</span>
-                        </div>
-                        <div class="card-content">
-                            <p class="text-light">Upload a CSV to find and verify thousands of emails in a single batch. Results will be available for download right here.</p>
-                            <button class="btn btn-primary mt-4" disabled>
-                                <i class="fas fa-arrow-up"></i>
-                                Upload CSV (Coming Soon)
-                            </button>
-                        </div>
+                <!-- Bulk Operations (Placeholder) -->
+                <div class="dashboard-card disabled">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-layer-group"></i>
+                            Bulk Processing
+                        </h3>
+                        <span class="badge-pro">Pro Plan</span>
                     </div>
-
-                    <!-- API & Docs (Placeholder) -->
-                    <div class="dashboard-card disabled">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-code"></i>
-                                API & Integrations
-                            </h3>
-                            <span class="badge-pro">Pro Plan</span>
-                        </div>
-                        <div class="card-content">
-                            <p class="text-light">Integrate our verification tools directly into your products with an upcoming REST API and native integrations.</p>
-                            <button class="btn btn-outline mt-4" disabled>
-                                <i class="fas fa-book"></i>
-                                View API Docs (Coming Soon)
-                            </button>
-                        </div>
+                    <div class="card-content">
+                        <p class="text-light">Upload a CSV file to find and verify thousands of emails in a single batch. Results will be available for download from your dashboard.</p>
+                        <button class="btn btn-primary mt-4" disabled>
+                            <i class="fas fa-arrow-up"></i>
+                            Upload CSV (Coming Soon)
+                        </button>
                     </div>
                 </div>
 
-                <aside class="layout-side">
-                    <!-- Manage Subscription -->
-                    <div class="dashboard-card compact" id="manageCard">
-                        <div class="card-header minimal">
-                            <h3 class="card-title">
-                                <i class="fas fa-credit-card"></i>
-                                Manage subscription
-                            </h3>
-                        </div>
-                        <div class="card-content">
-                            <p class="text-light">You’re on the Basic plan. Upgrade to unlock more monthly credits, API access, and bulk CSV tools.</p>
-                            <div class="plan-benefits">
-                                <span><i class="fas fa-check-circle"></i> Higher credit limits</span>
-                                <span><i class="fas fa-check-circle"></i> CSV exports and bulk actions</span>
-                                <span><i class="fas fa-check-circle"></i> Team-ready collaboration</span>
-                            </div>
-                            <button id="viewPlansBtn" class="btn btn-primary mt-4">
-                                <i class="fas fa-arrow-up"></i> View plans & pricing
-                            </button>
-                        </div>
+                <!-- Manage Subscription / Add Credits -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-credit-card"></i>
+                            Manage Subscription
+                        </h3>
                     </div>
+                    <div class="card-content">
+                        <p class="text-light">You are currently on the <strong>Basic Plan</strong>. Upgrade your plan to get more credits and unlock premium features.</p>
+                        <button id="viewPlansBtn" class="btn btn-primary mt-4">
+                            <i class="fas fa-arrow-up"></i> View Plans & Pricing
+                        </button>
+                    </div>
+                </div>
 
-                    <!-- Recent Activity -->
-                    <div class="dashboard-card compact" id="activityCard">
-                        <div class="card-header minimal">
-                            <h3 class="card-title">
-                                <i class="fas fa-history"></i>
-                                Recent timeline
-                            </h3>
-                        </div>
-                        <div class="card-content">
-                            <ul class="activity-list" id="activityList">
-                                <li class="activity-item empty">
-                                    <i class="fas fa-rocket"></i>
-                                    <div>
-                                        <strong>No activity yet</strong>
-                                        <span>Run your first search or verification to see the timeline.</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                <!-- API & Docs (Placeholder) -->
+                <div class="dashboard-card disabled">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-code"></i>
+                            API & Integrations
+                        </h3>
+                        <span class="badge-pro">Pro Plan</span>
                     </div>
-
-                    <!-- Insights -->
-                    <div class="dashboard-card compact insights-card">
-                        <div class="card-header minimal">
-                            <h3 class="card-title">
-                                <i class="fas fa-lightbulb"></i>
-                                Smart suggestions
-                            </h3>
-                        </div>
-                        <div class="card-content">
-                            <p id="insightsMessage">You’re on the free plan—upgrade to unlock higher credit limits and CSV workflows.</p>
-                            <ul class="insights-list">
-                                <li><i class="fas fa-bolt"></i> Generate several patterns, then verify the top match immediately.</li>
-                                <li><i class="fas fa-chart-line"></i> Track which domains respond best and tag them in your CRM.</li>
-                                <li><i class="fas fa-shield-alt"></i> SMTP checks may be blocked by providers—use them selectively for priority leads.</li>
-                            </ul>
-                        </div>
+                    <div class="card-content">
+                        <p class="text-light">Integrate our powerful email finding and verification tools directly into your own applications with our simple REST API.</p>
+                        <button class="btn btn-outline mt-4" disabled>
+                            <i class="fas fa-book"></i>
+                            View API Docs (Coming Soon)
+                        </button>
                     </div>
-                </aside>
+                </div>
             </div>
         </section>
     </div>
@@ -497,6 +412,7 @@
         <div class="text-muted">© truemail.io — Professional Email Finding Tool</div>
     </footer>
 
+    <script src="/config.js"></script>
     <script src="/app.js"></script>
     <script src="/auth.js"></script>
 </body>
